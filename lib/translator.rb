@@ -1,47 +1,28 @@
 # require modules here
+require 'yaml'
 
-#def load_library
-  # code goes here
-#end
 
-#def get_japanese_emoticon
-  # code goes here
-#end
-
-#def get_english_meaning
-  # code goes here
-#end
-
-require "yaml"
-require 'pry'
-
-def load_library(path)
-  emoticons = YAML.load_file(path)
-  emot_hash = { "get_meaning" => {}, "get_emoticon" => {} }
-  emoticons.each do | emotion, arr |
-   en, jp = arr
-    emot_hash["get_meaning"][jp] = emotion
-    emot_hash["get_emoticon"][en] = jp
+def load_library(file_path)
+  emoticons = YAML.load_file(file_path)
+  library = {}
+  emoticons.each do |meaning, emoticon|
+    library[meaning] = {:english => emoticon[0], :japanese => emoticon[1]}
   end
- emot_hash
+  library
 end
 
-def get_japanese_emoticon(path, emoticon)
-  emot_hash = load_library(path)
-  found = emot_hash["get_emoticon"][emoticon]
-  if found
-   found
-  else 
-   "Sorry, that emoticon was not found"
+def get_japanese_emoticon(file_path, emoticon)
+  library = load_library(file_path)
+  emoticon = library.keys.find do |key|
+    library[key][:english] == emoticon
   end
+  emoticon ? library[emoticon][:japanese] : "Sorry, that emoticon was not found"
 end
 
-def get_english_meaning(path, emoticon)
-  emot_hash = load_library(path)
-  found = emot_hash["get_meaning"][emoticon]
-  if found
-   found 
-  else
-   "Sorry, that emoticon was not found"
+def get_english_meaning(file_path, emoticon)
+  library = load_library(file_path)
+  emoticon = library.keys.find do |key|
+    library[key][:japanese] == emoticon
   end
+  emoticon ? emoticon : "Sorry, that emoticon was not found"
 end
